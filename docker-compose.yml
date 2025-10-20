@@ -1,10 +1,10 @@
 services:
   web:
-    # profiles: ["php8"]
+    profiles: ["myurgo"]
     build:
       context: ./docker
       dockerfile: Dockerfile
-    container_name: web
+    # container_name: web
     restart: unless-stopped
     extra_hosts:
       - "host.docker.internal:host-gateway"
@@ -12,7 +12,7 @@ services:
       - "${WEB_HTTP_PORT:-8080}:80"
       - "${VITE_PORT:-5173}:5173"
     volumes:
-      - ../src/urgo:/var/www/html
+      - ../src/myurgo:/var/www/html
       # - ../src/urgo:/var/www/html/urgo
       - ./src/tmp/xdebug-traces:/var/www/html/tmp/xdebug-traces
       - composer_cache:/tmp/composer
@@ -41,7 +41,7 @@ services:
     labels:
       - traefik.enable=true
       - traefik.docker.network=app-net
-      - traefik.http.routers.dev.rule=Host(`dev.${DOMAIN:-localhost}`) || Host(`dev.test`)
+      - traefik.http.routers.dev.rule=Host(`myurgo.${DOMAIN:-localhost}`) || Host(`myurgo.test`)
       - traefik.http.routers.dev.entrypoints=web
       - traefik.http.routers.dev.service=dev
       - traefik.http.services.dev.loadbalancer.server.port=80
