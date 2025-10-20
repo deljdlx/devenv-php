@@ -31,13 +31,18 @@ fi
 mkdir -p ../src
 
 
-
-# Run preflight, then runtime preflight, then ports check, then prompt profiles and start
 preflight
+
+
+
+. ./install.sh
+
+
+
+
 
 # shutdown any running containers
 docker compose --profile myurgo down
-
 docker compose build
 docker compose --profile myurgo  up -d
 

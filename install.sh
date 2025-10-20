@@ -1,6 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Source utilities (logging, checks, helpers)
+UTILS_FILE="$(dirname "$0")/scripts/launch-utils.sh"
+if [ -f "$UTILS_FILE" ]; then
+  # shellcheck disable=SC1090
+  . "$UTILS_FILE"
+else
+  echo "[launch] Missing $UTILS_FILE; aborting." >&2
+  exit 1
+fi
+
+
+
 # ==============================
 # Config : projets → dépôts Git
 # ==============================
@@ -119,5 +131,8 @@ main() {
 
   ok "Terminé."
 }
+
+
+section "Installation des projets"
 
 main "$@"
