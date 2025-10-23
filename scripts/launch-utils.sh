@@ -355,7 +355,7 @@ check_ports() {
     section "Vérification des ports d'écoute sur l'hôte" "🧩"
     local -a PORTS=(
         "${TRAEFIK_HTTP_PORT:-80}"
-        "${WEB_HTTP_PORT:-8080}"
+        "${WEB_HTTP_PORT:-8088}"
         "${VITE_PORT:-5173}"
         "${DB_PORT:-3306}"
         "${ES_HTTP_PORT:-9200}"

@@ -1,2 +1,5 @@
 .env
 backups/**
+src
+
+local-*
