@@ -34,13 +34,6 @@ mkdir -p ../src
 preflight
 
 
-
-. ./install.sh
-
-
-
-
-
 # shutdown any running containers
 docker compose --profile myurgo down
 docker compose build
