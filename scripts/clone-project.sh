@@ -3,72 +3,22 @@
 
 set -euo pipefail
 
+# load .env if exists
+if [ -f "$(dirname "$0")/../.env" ]; then
+  # shellcheck disable=SC1090
+  . "$(dirname "$0")/../.env"
+
+fi
+
+
 IS_LARAVEL=false
-CONTAINER_NAME="devenv-php-web-1"
-DEFAULT_HOST="localhost"
-SCHEMA="http"
-
-
-### ─────────────────────────────────────────────────────────────────────────────
-### Utilities (colors, UI, guards)
-### ─────────────────────────────────────────────────────────────────────────────
-
-has() { command -v "$1" >/dev/null 2>&1; }
-
-die() { echo "❌ $*" >&2; exit 1; }
-
-ensure() { has "$1" || die "Commande requise manquante: $1"; }
-
-# Minimal fallback if gum not present (but we still stop earlier)
-style() { gum style --padding "0 1" --border rounded --margin "1 0" "$@"; }
-
-note() { gum style --foreground "#9ca3af" "$*"; }
-ok() { gum style --foreground "#10b981" "✅ $*"; }
-warn() { gum style --foreground "#f59e0b" "⚠️  $*"; }
-
-
-confirm() {
-  local prompt="${1:-Confirmer ?}"
-  gum confirm --affirmative "Oui" --negative "Non" --prompt.foreground "#7c3aed" "$prompt"
-}
-
-spin_run() {
-  # Usage: spin_run "Titre" "CMD" [workdir]
-  local _title="$1"; shift
-  local _cmd="$1"; shift
-  local _wd="${1:-}"
-  if [[ -n "$_wd" ]]; then
-    DIR="$_wd" CMD="$_cmd" gum spin --title "$_title" -- bash -lc 'cd "$DIR" && eval "$CMD"'
-  else
-    CMD="$_cmd" gum spin --title "$_title" -- bash -lc 'eval "$CMD"'
-  fi
-}
-
-preview_file() {
-  local path="$1"
-  if [[ -f "$path" ]]; then
-    # Affiche proprement (max 400 lignes)
-    gum style --border normal --padding "0 1" --width 120 < <(awk 'NR<=400{print} NR==401{print "...(tronqué)"}' "$path")
-  fi
-}
-
-trap 'err "Erreur ligne $LINENO"; exit 1' ERR
-
-
-title() {
-    style --border-foreground "#7c3aed" --foreground "#7c3aed" " $* ";
-}
-
-section() {
-    style --border-foreground "#10b981" --foreground "#10b981" " $* ";
-}
-
-err() { gum style --foreground "#ef4444" "❌ $*"; }
-
 
 ### ─────────────────────────────────────────────────────────────────────────────
 ### Pre-flight
 ### ─────────────────────────────────────────────────────────────────────────────
+# include utilities
+UTILS_FILE="$(dirname "$0")/_utils.sh"
+. $UTILS_FILE
 
 ensure gum
 ensure git
@@ -115,35 +65,6 @@ if ! confirm "Continuer l'installation ?"; then
   err "Opération annulée."
   exit;
 fi
-
-
-# ===========================================================================
-section "Configuration du vhost Apache"
-
-# check if vhost destination already exists
-if [[ -e "$VHOST_DEST" ]]; then
-  echo "❌ Le fichier vhost '$VHOST_DEST' existe déjà." >&2
-  # ask to overwrite
-  if gum confirm "Voulez-vous écraser le fichier vhost existant ?"; then
-    rm -f "$VHOST_DEST"
-    echo "🗑️  Fichier vhost existant supprimé."
-  else
-    # keep file, display message and continue
-    warn "Fichier vhost existant conservé."
-  fi
-fi
-
-# create vhost file from template if not exists
-if [[ ! -e "$VHOST_DEST" ]]; then
-    sed -e "s/\${HOSTNAME}/$HOSTNAME/g" -e "s/\${FOLDER}/$PROJECT_NAME/g" "$VHOST_TEMPLATE" > "$VHOST_DEST"
-    echo "✅ Fichier vhost créé: $VHOST_DEST"
-
-fi
-
-# display vhost file content
-section "📄 Contenu du fichier vhost:"
-preview_file "$VHOST_DEST"
-echo ""
 
 # ask for confirmation to continue
 if ! confirm "Continuer l'installation ?"; then
@@ -238,6 +159,48 @@ if [[ -f "$INSTALL_PATH/artisan" ]]; then
 fi
 
 # ===========================================================================
+section "Configuration du vhost Apache"
+
+# check if vhost destination already exists
+if [[ -e "$VHOST_DEST" ]]; then
+  echo "❌ Le fichier vhost '$VHOST_DEST' existe déjà." >&2
+  # ask to overwrite
+  if gum confirm "Voulez-vous écraser le fichier vhost existant ?"; then
+    rm -f "$VHOST_DEST"
+    echo "🗑️  Fichier vhost existant supprimé."
+  else
+    # keep file, display message and continue
+    warn "Fichier vhost existant conservé."
+  fi
+fi
+
+# create vhost file from template if not exists
+# if laravel PUBLIC_PATH = $PROJECT_NAME/public else $PROJECT_NAME
+if [[ "$IS_LARAVEL" == true ]]; then
+    PUBLIC_PATH="$PROJECT_NAME/public"
+else
+    # check if public folder exists
+    if [[ -d "$INSTALL_PATH/public" ]]; then
+        PUBLIC_PATH="$PROJECT_NAME/public"
+    else
+        PUBLIC_PATH="$PROJECT_NAME"
+    fi
+fi
+
+if [[ ! -e "$VHOST_DEST" ]]; then
+    sed -e "s|\${HOSTNAME}|$HOSTNAME|g" -e "s|\${PUBLIC_PATH}|$PUBLIC_PATH|g" "$VHOST_TEMPLATE" > "$VHOST_DEST"
+    echo "✅ Fichier vhost créé: $VHOST_DEST"
+
+fi
+
+# display vhost file content
+section "📄 Contenu du fichier vhost:"
+preview_file "$VHOST_DEST"
+echo ""
+
+
+
+# ===========================================================================
 # ask restart docker container
 
 section "Redémarrage du conteneur Docker"
@@ -260,7 +223,8 @@ fi
 # ===========================================================================
 # display apache vhost list
 section "Liste des vhosts Apache dans le conteneur '$CONTAINER_NAME'"
-docker exec $CONTAINER_NAME a2query -s | awk '{print "'$SCHEMA'://"$1".'$DEFAULT_HOST'"}'
+docker exec -u root $CONTAINER_NAME apachectl -t -D DUMP_VHOSTS 2>/dev/null \
+  	| awk '/namevhost/ {print $4}' | sort | awk '{print "'$SCHEMA'://"$1}'
 
-
+# list sites enabled, kept for reference
 # docker exec devenv-php-web-1 a2query -s | awk '{print "http://"$1".localhost"}'

@@ -1,15 +1,5 @@
-# Makefile helpers for Docker dev environment
-# Usage examples:
-#   make help
-#   make up
-#   make build
-#   make dbash            # open bash as www-data in web container
-#   make xon              # enable xdebug (inside container)
-#   make xoff             # disable xdebug (inside container)
-#   make artisan ARGS="migrate"
-#   make composer ARGS="install"
-#   make npm ARGS="run dev"
-#   make test ARGS="--filter SomeTest"
+# load variables from .env file
+-include .env
 
 SHELL := bash
 DC := docker compose
@@ -24,9 +14,6 @@ help: ## Show this help
 getName: ## Get the web container name
 	@echo $(WEB);
 
-# test:
-# 	@echo $(WEB);
-
 clone: ## Clone a new project (runs the clone-project.sh script)
 	@bash "./scripts/clone-project.sh"
 
@@ -40,4 +27,17 @@ xoff: ## Disable Xdebug
 
 shell: ## Open a bash shell in the web container
 	@docker exec -it $(WEB) bash
+
+mysql: ## Open a mysql client shell in the db container
+	@docker exec -it $(WEB) mysql -h${MYSQL_HOST} -u${MYSQL_USER} -p${MYSQL_PASSWORD}
+
+vhosts: ## Regenerate virtual hosts and reload apache
+	@docker exec -u root $(WEB) apachectl -t -D DUMP_VHOSTS 2>/dev/null \
+  	| awk '/namevhost/ {print $$4}' | sort | awk '{print "'${SCHEMA}'://"$$1}'
+
+
+## @docker exec  $(WEB) a2query -s | awk '{print "'${SCHEMA}'://"$$1".'${DEFAULT_HOST}'"}'
+
+## | awk '{print "'${SCHEMA}'://"$1".'${DEFAULT_HOST}'"}'
+
 
