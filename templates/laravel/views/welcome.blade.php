@@ -78,6 +78,18 @@
     // Tri par URI pour stabilité
     usort($routes, fn($a,$b) => strcmp($a['uri'], $b['uri']));
 @endphp
+
+
+<?php
+    // display absolute path
+    $absPath = base_path();
+    $homeDir = getenv('HOME') ?: (getenv('HOMEDRIVE') . getenv('HOMEPATH'));
+    if ($homeDir && str_starts_with($absPath, $homeDir)) {
+        $absPath = '~' . substr($absPath, strlen($homeDir));
+    }
+?>
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -113,7 +125,7 @@
 <body>
 <div class="wrap">
     <div class="head">
-        <h1>🔧 Dev All-in-One</h1>
+        <h1>🔧 {{ $absPath }}</h1>
         <span class="chip">Laravel {{ $laravel }}</span>
         <span class="chip">PHP {{ $phpVer }}</span>
         <span class="chip">Env: {{ $appEnv }}</span>
