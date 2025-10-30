@@ -31,10 +31,12 @@ shell: ## Open a bash shell in the web container
 mysql: ## Open a mysql client shell in the db container
 	@docker exec -it $(WEB) mysql -h${MYSQL_HOST} -u${MYSQL_USER} -p${MYSQL_PASSWORD}
 
-vhosts: ## Regenerate virtual hosts and reload apache
+vhosts: ## list apache vhosts
 	@docker exec -u root $(WEB) apachectl -t -D DUMP_VHOSTS 2>/dev/null \
   	| awk '/namevhost/ {print $$4}' | sort | awk '{print "'${SCHEMA}'://"$$1}'
 
+saveDb: ## Take a snapshot of the database
+	@bash "./scripts/savedb.sh"
 
 ## @docker exec  $(WEB) a2query -s | awk '{print "'${SCHEMA}'://"$$1".'${DEFAULT_HOST}'"}'
 
