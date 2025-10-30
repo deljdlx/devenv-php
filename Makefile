@@ -8,6 +8,17 @@ WEB := $(shell cat .env | grep COMPOSE_PROJECT_NAME | sed s/COMPOSE_PROJECT_NAME
 
 .PHONY: help xon xoff
 
+
+start: ## Start the Docker containers
+	@$(DC) up -d
+
+stop: ## Stop the Docker containers
+	@$(DC) down
+
+restart: ## Restart the Docker containers
+	@$(DC) restart
+
+
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"}; /^[a-zA-Z0-9_-]+:.*##/ {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
@@ -37,6 +48,11 @@ vhosts: ## list apache vhosts
 
 saveDb: ## Take a snapshot of the database
 	@bash "./scripts/savedb.sh"
+
+newLaravel: ## Create a new Laravel 12 project
+	@bash "./scripts/create-laravel12.sh"
+
+
 
 ## @docker exec  $(WEB) a2query -s | awk '{print "'${SCHEMA}'://"$$1".'${DEFAULT_HOST}'"}'
 

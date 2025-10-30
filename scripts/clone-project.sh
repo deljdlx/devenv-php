@@ -48,7 +48,7 @@ if [[ -z "$PROJECT_NAME" || "$PROJECT_NAME" == "$REPO_URL" ]]; then
 fi
 
 # ===========================================================================
-VHOST_TEMPLATE="./templates/vhost.conf"
+VHOST_TEMPLATE="./templates/apache/vhost.conf"
 VHOST_DEST="./docker/apache/local-$PROJECT_NAME.conf"
 HOSTNAME="$PROJECT_NAME.$DEFAULT_HOST"
 
@@ -182,6 +182,10 @@ else
     # check if public folder exists
     if [[ -d "$INSTALL_PATH/public" ]]; then
         PUBLIC_PATH="$PROJECT_NAME/public"
+
+    # check if a src/index.php file exists
+    elif [[ -f "$INSTALL_PATH/src/index.php" ]]; then
+        PUBLIC_PATH="$PROJECT_NAME/src" 
     else
         PUBLIC_PATH="$PROJECT_NAME"
     fi
