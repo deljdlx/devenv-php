@@ -9,7 +9,7 @@ WEB := $(shell cat .env | grep COMPOSE_PROJECT_NAME | sed s/COMPOSE_PROJECT_NAME
 .PHONY: help xon xoff
 
 
-start: ## Start the Docker containers
+start: ## Start the Docker container
 	@$(DC) up -d
 
 stop: ## Stop the Docker containers
@@ -18,15 +18,15 @@ stop: ## Stop the Docker containers
 restart: ## Restart the Docker containers
 	@$(DC) restart
 
+status: ## Show the status of the Docker containers
+	@$(DC) ps | grep $(shell cat .env | grep COMPOSE_PROJECT_NAME | sed s/COMPOSE_PROJECT_NAME=//)
+
 
 help: ## Show this help
 	@awk 'BEGIN {FS = ":.*##"}; /^[a-zA-Z0-9_-]+:.*##/ {printf "\033[36m%-20s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST) | sort
 
 getName: ## Get the web container name
 	@echo $(WEB);
-
-clone: ## Clone a new project (runs the clone-project.sh script)
-	@bash "./scripts/clone-project.sh"
 
 xon: ## Enable Xdebug
 	@docker exec $(WEB) xdebug-on
@@ -44,18 +44,16 @@ mysql: ## Open a mysql client shell in the db container
 
 vhosts: ## list apache vhosts
 	@docker exec -u root $(WEB) apachectl -t -D DUMP_VHOSTS 2>/dev/null \
-  	| awk '/namevhost/ {print $$4}' | sort | awk '{print "'${SCHEMA}'://"$$1}'
+  	| awk '/namevhost/ {print $$4}' | sort | awk '{print "'${SCHEME}'://"$$1}'
 
 saveDb: ## Take a snapshot of the database
 	@bash "./scripts/savedb.sh"
 
-newLaravel: ## Create a new Laravel 12 project
+
+
+clone: ## Clone a new project (runs the clone-project.sh script)
+	@bash "./scripts/clone-project.sh"
+
+laravel: ## Create a new Laravel 12 project
 	@bash "./scripts/create-laravel12.sh"
-
-
-
-## @docker exec  $(WEB) a2query -s | awk '{print "'${SCHEMA}'://"$$1".'${DEFAULT_HOST}'"}'
-
-## | awk '{print "'${SCHEMA}'://"$1".'${DEFAULT_HOST}'"}'
-
 

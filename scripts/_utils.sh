@@ -8,12 +8,9 @@ die() { echo "❌ $*" >&2; exit 1; }
 
 ensure() { has "$1" || die "Commande requise manquante: $1"; }
 
-# Minimal fallback if gum not present (but we still stop earlier)
+
 style() { gum style --padding "0 1" --border rounded --margin "1 0" "$@"; }
 
-note() { gum style --foreground "#9ca3af" "$*"; }
-ok() { gum style --foreground "#10b981" "✅ $*"; }
-warn() { gum style --foreground "#f59e0b" "⚠️  $*"; }
 
 
 confirm() {
@@ -53,3 +50,6 @@ section() {
 }
 
 err() { gum style --foreground "#ef4444" "❌ $*"; }
+note() { gum style --foreground "#9ca3af" "$*"; }
+ok() { gum style --foreground "#10b981" "✅ $*"; }
+warn() { gum style --foreground "#f59e0b" "⚠️  $*"; }

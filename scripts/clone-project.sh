@@ -228,7 +228,7 @@ fi
 # display apache vhost list
 section "Liste des vhosts Apache dans le conteneur '$CONTAINER_NAME'"
 docker exec -u root $CONTAINER_NAME apachectl -t -D DUMP_VHOSTS 2>/dev/null \
-  	| awk '/namevhost/ {print $4}' | sort | awk '{print "'$SCHEMA'://"$1}'
+  	| awk '/namevhost/ {print $4}' | sort | awk '{print "'$SCHEME'://"$1}'
 
 # list sites enabled, kept for reference
 # docker exec devenv-php-web-1 a2query -s | awk '{print "http://"$1".localhost"}'
