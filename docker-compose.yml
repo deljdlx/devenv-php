@@ -47,7 +47,7 @@ services:
       # - traefik.http.routers.dev.rule=${DOMAINS:-localhost} # kept for reference
 
       # dynamic subdomains for local development
-      - traefik.http.routers.dev.rule=HostRegexp(`^([a-z0-9-]+)\.localhost$`) || Host(`localhost`)
+      - traefik.http.routers.dev.rule=HostRegexp(`^([A-z0-9-_]+)\.localhost$`) || Host(`localhost`)
       # Pour éviter d’éclipser d'autres routes plus spécifiques
       - traefik.http.routers.dev.priority=100
 volumes:
