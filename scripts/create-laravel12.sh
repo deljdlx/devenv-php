@@ -78,6 +78,12 @@ cd - > /dev/null
 # ask for confirmation to replace welcome page
 if gum confirm "Remplacer la page d'accueil par défaut par un modèle personnalisé ?"; then
     cp ./templates/laravel/views/welcome.blade.php "$INSTALL_PATH/resources/views/welcome.blade.php"
+
+    # replace placeholders ${BUILD_DATE} by current date
+    BUILD_DATE=$(date +"%Y-%m-%d %H:%M:%S")
+    sed -i "s|\${BUILD_DATE}|$BUILD_DATE|g" "$INSTALL_PATH/resources/views/welcome.blade.php"
+
+
     echo "Page d'accueil remplacée."
 else
     echo "Page d'accueil par défaut conservée."

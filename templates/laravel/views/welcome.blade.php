@@ -125,7 +125,7 @@
 <body>
 <div class="wrap">
     <div class="head">
-        <h1>🔧 {{ $absPath }}</h1>
+        <h1>🔧 {{ $absPath }} (BUILD : ${BUILD_DATE})</h1>
         <span class="chip">Laravel {{ $laravel }}</span>
         <span class="chip">PHP {{ $phpVer }}</span>
         <span class="chip">Env: {{ $appEnv }}</span>
