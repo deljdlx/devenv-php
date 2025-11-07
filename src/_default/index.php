@@ -144,260 +144,7 @@ $cwd          = getcwd();
     <meta charset="UTF-8">
     <title><?= h($TITLE) ?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        :root {
-            --bg: #050816;
-            --bg-soft: #0f172a;
-            --bg-soft-2: #111827;
-            --accent: #38bdf8;
-            --accent-soft: rgba(56,189,248,0.18);
-            --accent-alt: #a855f7;
-            --text: #e5e7eb;
-            --muted: #9ca3af;
-            --danger: #f97316;
-            --radius-xl: 24px;
-            --radius: 14px;
-            --shadow-soft: 0 18px 60px rgba(15,23,42,0.85);
-            --border-soft: 1px solid rgba(148,163,253,0.12);
-            --font: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text", -system-ui, sans-serif;
-        }
-
-        * { box-sizing: border-box; }
-
-        body {
-            margin: 0;
-            padding: 32px;
-            font-family: var(--font);
-            background: radial-gradient(circle at top, #0f172a 0, #020817 45%, #000 100%);
-            color: var(--text);
-        }
-
-        .layout {
-            max-width: 1480px;
-            margin: 0 auto;
-        }
-
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            gap: 24px;
-            margin-bottom: 28px;
-        }
-
-        .title-block h1 {
-            font-size: 32px;
-            margin: 0 0 6px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .title-pill {
-            font-size: 11px;
-            padding: 4px 10px;
-            border-radius: 999px;
-            border: 1px solid rgba(56,189,248,0.3);
-            color: var(--accent);
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            background: radial-gradient(circle at top left, rgba(56,189,248,0.12), transparent);
-        }
-
-        .subtitle {
-            margin: 8px 0 0;
-            font-size: 13px;
-            color: var(--muted);
-        }
-
-        .tagline {
-            margin-top: 4px;
-            font-size: 11px;
-            color: var(--danger);
-            opacity: 0.9;
-        }
-
-        .pill-row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 10px;
-            font-size: 10px;
-        }
-
-        .pill {
-            padding: 4px 9px;
-            border-radius: 999px;
-            border: 1px solid rgba(148,163,253,0.18);
-            background: rgba(15,23,42,0.9);
-            color: var(--muted);
-            display: inline-flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .pill strong {
-            color: var(--accent);
-            font-weight: 500;
-        }
-
-        .warning {
-            font-size: 10px;
-            color: var(--danger);
-            text-align: right;
-            opacity: .9;
-        }
-
-        main {
-            display: grid;
-            grid-template-columns: 2.1fr 1.6fr;
-            gap: 18px;
-        }
-
-        .card {
-            background: radial-gradient(circle at top left, rgba(56,189,248,0.06), transparent) ,
-                        radial-gradient(circle at top right, rgba(168,85,247,0.05), transparent),
-                        var(--bg-soft);
-            border-radius: var(--radius-xl);
-            padding: 14px 14px 12px;
-            box-shadow: var(--shadow-soft);
-            border: var(--border-soft);
-            backdrop-filter: blur(14px);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: baseline;
-            gap: 10px;
-            margin-bottom: 8px;
-        }
-
-        .card-title {
-            font-size: 14px;
-            font-weight: 500;
-            letter-spacing: .02em;
-            color: var(--accent);
-            display: inline-flex;
-            gap: 6px;
-            align-items: center;
-        }
-
-        .card-sub {
-            font-size: 10px;
-            color: var(--muted);
-        }
-
-        .label {
-            font-size: 9px;
-            padding: 2px 6px;
-            border-radius: 999px;
-            border: 1px solid rgba(56,189,248,0.25);
-            color: var(--accent-alt);
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 10px;
-        }
-
-        th, td {
-            padding: 4px 4px;
-            vertical-align: top;
-        }
-
-        th {
-            text-align: left;
-            color: var(--muted);
-            font-weight: 500;
-            font-size: 9px;
-            border-bottom: 1px solid rgba(75,85,99,0.6);
-        }
-
-        tr:nth-child(even) td {
-            background: rgba(15,23,42,0.78);
-        }
-
-        tr:nth-child(odd) td {
-            background: rgba(9,9,15,0.85);
-        }
-
-        td.key {
-            width: 34%;
-            color: var(--accent);
-            white-space: nowrap;
-        }
-
-        td.val {
-            color: var(--text);
-            word-break: break-all;
-        }
-
-        code {
-            font-family: "SF Mono", Menlo, Consolas, monospace;
-            font-size: 9px;
-            padding: 1px 4px;
-            border-radius: 6px;
-            background: rgba(15,23,42,0.98);
-            border: 1px solid rgba(75,85,99,0.7);
-        }
-
-        .ext-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 3px 6px;
-            font-size: 9px;
-            margin-top: 2px;
-        }
-
-        .ext-pill {
-            border-radius: 10px;
-            padding: 3px 6px;
-            background: rgba(9,9,15,0.95);
-            border: 1px solid rgba(75,85,99,0.7);
-            color: var(--muted);
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .ext-pill span {
-            font-size: 7px;
-            color: var(--accent-alt);
-        }
-
-        .hint {
-            font-size: 8px;
-            color: var(--muted);
-            margin-top: 3px;
-        }
-
-        pre.small {
-            margin: 4px 0 0;
-            padding: 4px 6px;
-            font-size: 8px;
-            line-height: 1.4;
-            max-height: 120px;
-            overflow: auto;
-            background: rgba(3,7,18,0.98);
-            border-radius: 8px;
-            border: 1px solid rgba(75,85,99,0.6);
-        }
-
-        .split {
-            display: grid;
-            grid-template-columns: 1.6fr 1.4fr;
-            gap: 10px;
-        }
-
-        @media (max-width: 1024px) {
-            body { padding: 16px; }
-            main { grid-template-columns: 1fr; }
-            header { flex-direction: column; align-items: flex-start; }
-        }
-    </style>
+    <link rel="stylesheet" href="/assets/css/style.css" />
 </head>
 <body>
 <div class="layout">
@@ -405,7 +152,7 @@ $cwd          = getcwd();
         <div class="title-block">
             <div class="title-pill">
                 <span>🛰️</span>
-                <span>Runtime Intel Probe</span>
+                <span><?=__FILE__?></span>
             </div>
             <h1><?= h($TITLE) ?> <span style="font-size:16px;color:var(--accent-alt);">1.0.0</span></h1>
             <p class="subtitle">
@@ -643,7 +390,13 @@ $cwd          = getcwd();
                     $count = 0;
                     foreach ($env as $k => $v):
                         if (!is_string($k)) continue;
-                        if (looksLikeSecretKey($k)) continue; // skip naïf
+                        if (looksLikeSecretKey($k)) {
+                            echo '<tr>';
+                                echo '<td class="key">' . h($k) . '</td>';
+                                echo '<td class="val">****</td>';
+                            echo '</tr>';
+                            continue; // skip naïf
+                        }
                         if (is_array($v)) $v = json_encode($v, JSON_UNESCAPED_SLASHES);
                         $count++;
                         if ($count > 200) break; // hard cap

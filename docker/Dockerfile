@@ -1,5 +1,5 @@
 FROM composer:2 AS composer_stage
-FROM debian:bullseye
+FROM debian:bookworm
 
 # Build args to remap www-data user to host UID/GID for proper file ownership on bind mounts
 ARG HOST_UID=1000
@@ -89,7 +89,8 @@ COPY .bashrc /root/.bashrc
 RUN cat >> /root/.bashrc <<'EOF'
 # Auto-switch to www-data for interactive shells
 if [ "$EUID" -eq 0 ] && [[ $- == *i* ]] && [ -t 0 ]; then
-    exec sudo -u www-data -H bash -l
+    # exec sudo -u www-data -H bash -l
+    exec sudo -E -u www-data -H bash
 fi
 EOF
 
@@ -189,6 +190,11 @@ COPY php/elastic_apm.ini /etc/php/8.3/fpm/conf.d/98-elastic-apm.ini
 # COPY php/elastic_apm.ini /etc/php/8.3/cli/conf.d/98-elastic-apm.ini
 COPY php/elastic_apm.ini /etc/php/7.4/fpm/conf.d/98-elastic-apm.ini
 # COPY php/elastic_apm.ini /etc/php/7.4/cli/conf.d/98-elastic-apm.ini
+
+# uncomment clear_env=no to pass env vars to php-fpm
+RUN sed -i 's/^;clear_env = no/clear_env = no/' /etc/php/8.4/fpm/pool.d/www.conf
+RUN sed -i 's/^;clear_env = no/clear_env = no/' /etc/php/8.3/fpm/pool.d/www.conf
+RUN sed -i 's/^;clear_env = no/clear_env = no/' /etc/php/7.4/fpm/pool.d/www.conf
 
 
 # ===================================================
