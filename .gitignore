@@ -1,6 +1,7 @@
 .env
 backups/**
-src/**
+src/*
 !src/.gitkeep
+!src/_default
 
 local-*
