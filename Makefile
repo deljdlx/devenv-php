@@ -49,5 +49,11 @@ vhosts: ## list apache vhosts
 saveDb: ## Take a snapshot of the database
 	@bash "./scripts/savedb.sh"
 
+
+
 clone: ## Clone a new project (runs the clone-project.sh script)
 	@bash "./scripts/clone-project.sh"
+
+laravel: ## Create a new Laravel 12 project
+	@bash "./scripts/create-laravel12.sh"
+
